@@ -7,17 +7,19 @@
 extern crate coinnect;
 
 use coinnect::coinnect::Coinnect;
-use coinnect::kraken::KrakenCreds;
 use coinnect::exchange::Exchange::*;
+use coinnect::kraken::KrakenCreds;
 use coinnect::types::Pair::*;
 
 fn main() {
-    // We create a Coinnect Generic API
-    // Since Kraken does not need customer_id field, we set it to None
-    let my_creds = KrakenCreds::new("my_optionnal_name", "api_key", "api_secret");
-    let mut my_api = Coinnect::new(Kraken, my_creds).unwrap();
-    let ticker = my_api.ticker(ETC_BTC);
+	// We create a Coinnect Generic API
+	// Since Kraken does not need customer_id field, we set it to None
+	let my_creds = KrakenCreds::new("my_optionnal_name", "api_key", "api_secret");
+	let mut my_api = Coinnect::new(Kraken, my_creds).unwrap();
+	let ticker = my_api.ticker(ETC_BTC);
 
-    println!("ETC_BTC last trade price is {}.",
-             ticker.unwrap().last_trade_price);
+	println!(
+		"ETC_BTC last trade price is {}.",
+		ticker.unwrap().last_trade_price
+	);
 }

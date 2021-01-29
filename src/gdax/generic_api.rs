@@ -7,132 +7,127 @@ use gdax::api::GdaxApi;
 use gdax::utils;
 
 use error::*;
-use types::*;
 use helpers;
+use types::*;
 
 impl ExchangeApi for GdaxApi {
-    fn ticker(&mut self, pair: Pair) -> Result<Ticker> {
+	fn ticker(&mut self, pair: Pair) -> Result<Ticker> {
+		let result = self.return_ticker(pair)?;
 
-        let result = self.return_ticker(pair)?;
+		let price = helpers::from_json_bigdecimal(&result["price"], "price")?;
+		let ask = helpers::from_json_bigdecimal(&result["ask"], "ask")?;
+		let bid = helpers::from_json_bigdecimal(&result["bid"], "bid")?;
+		let vol = helpers::from_json_bigdecimal(&result["volume"], "volume")?;
 
-        let price = helpers::from_json_bigdecimal(&result["price"], "price")?;
-        let ask = helpers::from_json_bigdecimal(&result["ask"], "ask")?;
-        let bid = helpers::from_json_bigdecimal(&result["bid"], "bid")?;
-        let vol = helpers::from_json_bigdecimal(&result["volume"], "volume")?;
+		Ok(Ticker {
+			timestamp: helpers::get_unix_timestamp_ms(),
+			pair,
+			last_trade_price: price,
+			lowest_ask: ask,
+			highest_bid: bid,
+			volume: Some(vol),
+		})
+	}
 
-        Ok(Ticker {
-               timestamp: helpers::get_unix_timestamp_ms(),
-               pair,
-               last_trade_price: price,
-               lowest_ask: ask,
-               highest_bid: bid,
-               volume: Some(vol),
-           })
-    }
+	fn orderbook(&mut self, pair: Pair) -> Result<Orderbook> {
+		let raw_response = self.return_order_book(pair)?;
 
-    fn orderbook(&mut self, pair: Pair) -> Result<Orderbook> {
+		let result = utils::parse_result(&raw_response)?;
 
-        let raw_response = self.return_order_book(pair)?;
+		let mut ask_offers = Vec::new();
+		let mut bid_offers = Vec::new();
 
-        let result = utils::parse_result(&raw_response)?;
+		let ask_array = result["asks"]
+			.as_array()
+			.ok_or_else(|| ErrorKind::InvalidFieldFormat(format!("{}", result["asks"])))?;
+		let bid_array = result["bids"]
+			.as_array()
+			.ok_or_else(|| ErrorKind::InvalidFieldFormat(format!("{}", result["asks"])))?;
 
-        let mut ask_offers = Vec::new();
-        let mut bid_offers = Vec::new();
+		for ask in ask_array {
+			let price = helpers::from_json_bigdecimal(&ask[0], "ask price")?;
+			let volume = helpers::from_json_bigdecimal(&ask[1], "ask volume")?;
 
-        let ask_array =
-            result["asks"]
-                .as_array()
-                .ok_or_else(|| ErrorKind::InvalidFieldFormat(format!("{}", result["asks"])))?;
-        let bid_array =
-            result["bids"]
-                .as_array()
-                .ok_or_else(|| ErrorKind::InvalidFieldFormat(format!("{}", result["asks"])))?;
+			ask_offers.push((price, volume));
+		}
 
-        for ask in ask_array {
-            let price = helpers::from_json_bigdecimal(&ask[0], "ask price")?;
-            let volume = helpers::from_json_bigdecimal(&ask[1], "ask volume")?;
+		for bid in bid_array {
+			let price = helpers::from_json_bigdecimal(&bid[0], "bid price")?;
+			let volume = helpers::from_json_bigdecimal(&bid[1], "bid volume")?;
 
-            ask_offers.push((price, volume));
-        }
+			bid_offers.push((price, volume));
+		}
 
-        for bid in bid_array {
-            let price = helpers::from_json_bigdecimal(&bid[0], "bid price")?;
-            let volume = helpers::from_json_bigdecimal(&bid[1], "bid volume")?;
+		Ok(Orderbook {
+			timestamp: helpers::get_unix_timestamp_ms(),
+			pair: pair,
+			asks: ask_offers,
+			bids: bid_offers,
+		})
+	}
 
-            bid_offers.push((price, volume));
-        }
+	fn add_order(
+		&mut self,
+		order_type: OrderType,
+		pair: Pair,
+		quantity: Volume,
+		price: Option<Price>,
+	) -> Result<OrderInfo> {
+		//let pair_name = match utils::get_pair_string(&pair) {
+		//Some(name) => name,
+		//None => return Err(ErrorKind::PairUnsupported.into()),
+		//};
 
-        Ok(Orderbook {
-            timestamp: helpers::get_unix_timestamp_ms(),
-            pair: pair,
-            asks: ask_offers,
-            bids: bid_offers,
-        })
-    }
+		let result = match order_type {
+			OrderType::BuyLimit => {
+				if price.is_none() {
+					return Err(ErrorKind::MissingPrice.into());
+				}
 
-    fn add_order(&mut self,
-                 order_type: OrderType,
-                 pair: Pair,
-                 quantity: Volume,
-                 price: Option<Price>)
-                 -> Result<OrderInfo> {
-        //let pair_name = match utils::get_pair_string(&pair) {
-        //Some(name) => name,
-        //None => return Err(ErrorKind::PairUnsupported.into()),
-        //};
+				// Unwrap safe here with the check above.
+				self.buy_limit(pair, quantity, price.unwrap(), None, None)
+			}
+			OrderType::BuyMarket => self.buy_market(pair, quantity),
+			OrderType::SellLimit => {
+				if price.is_none() {
+					return Err(ErrorKind::MissingPrice.into());
+				}
 
-        let result = match order_type {
-            OrderType::BuyLimit => {
-                if price.is_none() {
-                    return Err(ErrorKind::MissingPrice.into());
-                }
+				// Unwrap safe here with the check above.
+				self.sell_limit(pair, quantity, price.unwrap(), None, None)
+			}
+			OrderType::SellMarket => self.sell_market(pair, quantity),
+		};
 
-                // Unwrap safe here with the check above.
-                self.buy_limit(pair, quantity, price.unwrap(), None, None)
-            }
-            OrderType::BuyMarket => self.buy_market(pair, quantity),
-            OrderType::SellLimit => {
-                if price.is_none() {
-                    return Err(ErrorKind::MissingPrice.into());
-                }
+		Ok(OrderInfo {
+			timestamp: helpers::get_unix_timestamp_ms(),
+			identifier: vec![result?["id"]
+				.as_str()
+				.ok_or_else(|| ErrorKind::MissingField("id".to_string()))?
+				.to_string()],
+		})
+	}
 
-                // Unwrap safe here with the check above.
-                self.sell_limit(pair, quantity, price.unwrap(), None, None)
-            }
-            OrderType::SellMarket => self.sell_market(pair, quantity),
-        };
+	/// Return the balances for each currency on the account
+	fn balances(&mut self) -> Result<Balances> {
+		let raw_response = self.return_balances()?;
+		let result = utils::parse_result(&raw_response)?;
 
-        Ok(OrderInfo {
-               timestamp: helpers::get_unix_timestamp_ms(),
-               identifier: vec![result?["id"]
-                                    .as_str()
-                                    .ok_or_else(|| {
-                                                    ErrorKind::MissingField("id".to_string())
-                                                })?
-                                    .to_string()],
-           })
-    }
+		let mut balances = Balances::new();
 
-    /// Return the balances for each currency on the account
-    fn balances(&mut self) -> Result<Balances> {
-        let raw_response = self.return_balances()?;
-        let result = utils::parse_result(&raw_response)?;
+		for (key, val) in result.iter() {
+			let currency = utils::get_currency_enum(key);
 
-        let mut balances = Balances::new();
+			match currency {
+				Some(c) => {
+					let amount = helpers::from_json_bigdecimal(&val, "amount")?;
 
-        for (key, val) in result.iter() {
-            let currency = utils::get_currency_enum(key);
+					balances.insert(c, amount);
+				}
+				_ => (),
+			}
+		}
 
-            match currency {
-                Some(c) => {
-                    let amount = helpers::from_json_bigdecimal(&val, "amount")?;
-
-                    balances.insert(c, amount);
-                },
-                _ => ()
-            }
-        }
-
-        Ok(balances)
-    }
+		Ok(balances)
+	}
 }
