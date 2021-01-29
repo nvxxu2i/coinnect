@@ -744,4 +744,5 @@ pub enum Pair {
 	ZEN_BTC,
 	ZRX_BTC,
 	ZRX_ETH,
+	XLM_USD,
 }

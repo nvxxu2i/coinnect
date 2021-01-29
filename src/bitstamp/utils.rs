@@ -31,6 +31,7 @@ lazy_static! {
 		m.insert(BCH_USD, "bchusd");
 		m.insert(BCH_EUR, "bcheur");
 		m.insert(BCH_BTC, "bchbtc");
+		m.insert(XLM_USD, "xlmusd");
 		m
 	};
 }
