@@ -16,22 +16,23 @@ use types::Pair::*;
 lazy_static! {
 	static ref PAIRS_STRING: BidirMap<Pair, &'static str> = {
 		let mut m = BidirMap::new();
-		m.insert(BTC_USD, "btcusd");
-		m.insert(BTC_EUR, "btceur");
-		m.insert(EUR_USD, "eurusd");
-		m.insert(XRP_USD, "xrpusd");
-		m.insert(XRP_EUR, "xrpeur");
-		m.insert(XRP_BTC, "xrpbtc");
-		m.insert(LTC_USD, "ltcusd");
-		m.insert(LTC_EUR, "ltceur");
-		m.insert(LTC_BTC, "ltcbtc");
-		m.insert(ETH_USD, "ethusd");
-		m.insert(ETH_EUR, "etheur");
-		m.insert(ETH_BTC, "ethbtc");
-		m.insert(BCH_USD, "bchusd");
-		m.insert(BCH_EUR, "bcheur");
 		m.insert(BCH_BTC, "bchbtc");
+		m.insert(BCH_EUR, "bcheur");
+		m.insert(BCH_USD, "bchusd");
+		m.insert(BTC_EUR, "btceur");
+		m.insert(BTC_USD, "btcusd");
+		m.insert(ETH_BTC, "ethbtc");
+		m.insert(ETH_EUR, "etheur");
+		m.insert(ETH_USD, "ethusd");
+		m.insert(EUR_USD, "eurusd");
+		m.insert(LINK_USD, "linkusd");
+		m.insert(LTC_BTC, "ltcbtc");
+		m.insert(LTC_EUR, "ltceur");
+		m.insert(LTC_USD, "ltcusd");
 		m.insert(XLM_USD, "xlmusd");
+		m.insert(XRP_BTC, "xrpbtc");
+		m.insert(XRP_EUR, "xrpeur");
+		m.insert(XRP_USD, "xrpusd");
 		m
 	};
 }

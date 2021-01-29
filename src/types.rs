@@ -404,9 +404,6 @@ pub enum Currency {
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[allow(non_camel_case_types)]
 pub enum Pair {
-	_1ST_BTC,
-	_1ST_ETH,
-	_2GIVE_BTC,
 	ABY_BTC,
 	ADA_BTC,
 	ADT_BTC,
@@ -570,6 +567,7 @@ pub enum Pair {
 	LBC_BTC,
 	LGD_BTC,
 	LGD_ETH,
+	LINK_USD,
 	LMC_BTC,
 	LSK_BTC,
 	LSK_ETH,
@@ -716,6 +714,7 @@ pub enum Pair {
 	XEM_ETH,
 	XLM_BTC,
 	XLM_ETH,
+	XLM_USD,
 	XMG_BTC,
 	XMR_BTC,
 	XMR_ETH,
@@ -744,5 +743,7 @@ pub enum Pair {
 	ZEN_BTC,
 	ZRX_BTC,
 	ZRX_ETH,
-	XLM_USD,
+	_1ST_BTC,
+	_1ST_ETH,
+	_2GIVE_BTC,
 }
