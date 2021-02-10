@@ -615,6 +615,7 @@ pub enum Pair {
 	OK_BTC,
 	OMG_BTC,
 	OMG_ETH,
+	OMG_USD,
 	OMG_USDT,
 	OMNI_BTC,
 	PART_BTC,

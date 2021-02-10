@@ -29,6 +29,7 @@ lazy_static! {
 		m.insert(LTC_BTC, "ltcbtc");
 		m.insert(LTC_EUR, "ltceur");
 		m.insert(LTC_USD, "ltcusd");
+		m.insert(OMG_USD, "omgusd");
 		m.insert(XLM_USD, "xlmusd");
 		m.insert(XRP_BTC, "xrpbtc");
 		m.insert(XRP_EUR, "xrpeur");
