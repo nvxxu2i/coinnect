@@ -744,6 +744,7 @@ pub enum Pair {
 	ZEN_BTC,
 	ZRX_BTC,
 	ZRX_ETH,
+	ZRX_USD,
 	_1ST_BTC,
 	_1ST_ETH,
 	_2GIVE_BTC,

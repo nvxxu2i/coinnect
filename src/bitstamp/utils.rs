@@ -34,6 +34,7 @@ lazy_static! {
 		m.insert(XRP_BTC, "xrpbtc");
 		m.insert(XRP_EUR, "xrpeur");
 		m.insert(XRP_USD, "xrpusd");
+		m.insert(ZRX_USD, "zrxusd");
 		m
 	};
 }
