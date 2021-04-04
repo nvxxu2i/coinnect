@@ -26,6 +26,7 @@ lazy_static! {
 		m.insert(ETH_USD, "ethusd");
 		m.insert(EUR_USD, "eurusd");
 		m.insert(LINK_USD, "linkusd");
+		m.insert(KNC_USD, "kncusd");
 		m.insert(LTC_BTC, "ltcbtc");
 		m.insert(LTC_EUR, "ltceur");
 		m.insert(LTC_USD, "ltcusd");

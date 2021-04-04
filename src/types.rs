@@ -562,6 +562,7 @@ pub enum Pair {
 	IOC_BTC,
 	ION_BTC,
 	IOP_BTC,
+	KNC_USD,
 	KMD_BTC,
 	KORE_BTC,
 	LBC_BTC,
