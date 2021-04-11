@@ -356,6 +356,18 @@ impl BitstampApi {
 
 		self.private_query(&params)
 	}
+
+	pub fn cancel_orders(&mut self, pair: Pair) -> Result<Map<String, Value>> {
+		let mut params = HashMap::new();
+		params.insert("method", "cancel_all_orders");
+		let pair_name = match utils::get_pair_string(&pair) {
+			Some(name) => name,
+			None => return Err(ErrorKind::PairUnsupported.into()),
+		};
+		params.insert("pair", pair_name);
+
+		self.private_query(&params)
+	}
 }
 
 #[cfg(test)]
