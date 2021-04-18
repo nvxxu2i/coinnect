@@ -97,9 +97,7 @@ impl BitstampApi {
 		let method: &str = params
 			.get("method")
 			.ok_or_else(|| "Missing \"method\" field.")?;
-		let pair: &str = params
-			.get("pair")
-			.ok_or_else(|| "Missing \"pair\" field.")?;
+		let pair = params.get("pair").cloned();
 		let url: String = utils::build_url(method, pair);
 
 		self.block_or_continue();
@@ -125,9 +123,7 @@ impl BitstampApi {
 		let method: &str = params
 			.get("method")
 			.ok_or_else(|| "Missing \"method\" field.")?;
-		let pair: &str = params
-			.get("pair")
-			.ok_or_else(|| "Missing \"pair\" field.")?;
+		let pair = params.get("pair").cloned();
 		let url: String = utils::build_url(method, pair);
 
 		let nonce = utils::generate_nonce(None);
@@ -353,6 +349,15 @@ impl BitstampApi {
 		params.insert("pair", pair_name);
 
 		params.insert("amount", &amount_string);
+
+		self.private_query(&params)
+	}
+
+	pub fn cancel_order(&mut self, order: u64) -> Result<Map<String, Value>> {
+		let mut params = HashMap::new();
+		let order = order.to_string();
+		params.insert("method", "cancel_order");
+		params.insert("id", &order);
 
 		self.private_query(&params)
 	}

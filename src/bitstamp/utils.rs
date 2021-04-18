@@ -77,8 +77,11 @@ pub fn build_signature(
 	Ok(String::from_utf8(signature)?)
 }
 
-pub fn build_url(method: &str, pair: &str) -> String {
-	"https://www.bitstamp.net/api/v2/".to_string() + method + "/" + pair + "/"
+pub fn build_url(method: &str, pair: Option<&str>) -> String {
+	match pair {
+		Some(pair) => "https://www.bitstamp.net/api/v2/".to_string() + method + "/" + pair + "/",
+		None => "https://www.bitstamp.net/api/v2/".to_string() + method + "/",
+	}
 }
 
 pub fn deserialize_json(json_string: &str) -> Result<Map<String, Value>> {
