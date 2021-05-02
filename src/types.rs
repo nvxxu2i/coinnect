@@ -421,6 +421,7 @@ pub enum Pair {
 	AUR_BTC,
 	BAT_BTC,
 	BAT_ETH,
+	BAT_USD,
 	BAY_BTC,
 	BCC_BTC,
 	BCC_ETH,
