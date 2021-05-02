@@ -696,6 +696,7 @@ pub enum Pair {
 	TX_BTC,
 	UBQ_BTC,
 	UNB_BTC,
+	UNI_USD,
 	USDT_USD,
 	VIA_BTC,
 	VOX_BTC,
