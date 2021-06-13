@@ -404,6 +404,7 @@ pub enum Currency {
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[allow(non_camel_case_types)]
 pub enum Pair {
+	AAVE_USD,
 	ABY_BTC,
 	ADA_BTC,
 	ADT_BTC,
